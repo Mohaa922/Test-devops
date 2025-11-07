@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Charte Graphique show {% endblock %}
+
+{% block body %}
+        <div class="w-4xl mx-auto p-6 py-12 bg-gray-50 rounded-lg">
+            <twig:CustomChartForm />
+            <h2 class="text-2xl font-semibold mb-4">Couleurs</h2>
+            <div class="flex space-x-4 mb-8">
+                {% for row in chart.colors %}
+                        <div
+                    class="w-24 h-24 rounded-full shadow-md flex flex-col items-center justify-center text-white font-semibold" style="background-color: {{row.couleur}};">
+                    <p>{{row.nom}}</p> 
+                    <p>{{row.couleur}}</p>
+                </div>
+                {% endfor %}
+
+            </div>
+            <twig:Button ButtonId="{{chart.buttonType}}" />
+        </div>
+{% endblock %}

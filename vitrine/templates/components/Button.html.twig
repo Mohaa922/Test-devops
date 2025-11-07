@@ -1,0 +1,40 @@
+<div{{ attributes }} class="flex space-x-4 mb-8">
+{## --- SHOWCASE --- ##}
+    {% for key, cssClass in this.getButtonClassesbyId %}
+        {% if key < 4 %} 
+            <div>
+                <button class="{{ cssClass.default }}">Button example</button>
+            </div>
+        {% elseif key == 6%}
+        <div>
+            <button class="{{ cssClass.default }}">Button example
+                <span aria-hidden="true" class="{{ cssClass.hover }}"></span>
+            </button>
+        </div>
+        {% else %}
+        <div class="relative">
+                <button class="{{ cssClass.default }}">Button example</button>
+                <span class="{{ cssClass.hover }}"></span>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+{## --- SPECIFIC BUTTON STYLES --- 
+    {% set  cssClass = this.getThemeStyles() %}
+        {% if cssClass.animate == 0 %} 
+            <div>
+                <button class="{{ cssClass.default }}">Button example</button>
+            </div>
+        {% elseif cssClass.animate == 2 %}
+        <div>
+            <button class="{{ cssClass.default }}">Button example
+                <span aria-hidden="true" class="{{ cssClass.hover }}"></span>
+            </button>
+        </div>
+        {% else %}
+        <div class="relative">
+                <button class="{{ cssClass.default }}">Button example</button>
+                <span class="{{ cssClass.hover }}"></span>
+            </div>
+        {% endif %}##}
+</div>

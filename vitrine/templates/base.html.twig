@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ma vitrine|{% block title %}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    {# ico #}
+    {% block stylesheets %}
+    {% endblock %}
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+
+<body class="">
+    
+    {% for label, messages in app.flashes %}
+    {% for message in messages %}
+    <div class="z-91 fixed top-4 left-1/2 transform -translate-x-1/2 text-white {{ label }} px-4 py-3 rounded-md shadow-md"
+        role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endfor %}
+
+    <header class="">
+        {% block nav %}
+        <div class="">
+            <div id="navbar"
+                class="flex w-full justify-between items-center flex-wrap p-2 px-6  bg-white shadow-lg z-90 fixed top-0 left-0 right-0 ">
+
+                <div class="text-2xl">
+                    <a href="{{ path('app_home') }}">WEBSITE</a>
+                </div>
+        
+                <div class="block md:hidden">
+                    <label id="nav-toggle" for="toggleNavbar" class="flex gap-1 py-3 px-6  cursor-pointer select-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5">
+                            </path>
+                        </svg>
+                    </label>
+                </div>
+                <input type="checkbox" name="" id="toggleNavbar" class="peer hidden">
+        
+                <!-- NAV items -->
+                <ul
+                    class="text-xl md:text-lg my-5 md:my-0 h-0 w-full md:w-auto md:h-fit overflow-hidden peer-checked:h-fit absolute md:relative peer-checked:relative 
+                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                        flex gap-3 items-center md:justify-center md:peer-checked:items-center justify-stretch peer-checked:flex-grow peer-checked:flex-col md:peer-checked:flex-row md:peer-checked:flex-grow-0
+                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                        opacity-0 md:opacity-100 peer-checked:opacity-100 transition duration-300 peer-checked:translate-y-2 md:peer-checked:translate-y-0
+                                                                                                                                                                                                                                                                                                                                                                        ">
+                    <li class="py-2 px-4 text-center"><a href="{{ path('app_home') }}#a-propos">A propos</a></li>
+                    <li class="py-2 px-4 text-center"><a href="{{ path('app_chartegraphique') }}">Nos services</a></li>
+                    <li class="py-2 px-4 text-center"><a href="{{ path('app_vitrine2') }}">Nos equipes</a></li>
+                    <li
+                        class="text-blue-600 text-lg rounded-b-full rounded-tr-full bg-[#DAEBFF] hover:bg-blue-600 hover:text-white py-3 px-6 text-center" id="button_nav">
+                        <a href="{{ path('app_contact') }}" >Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endblock %}
+    </header>
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+    {% block footer %}
+    <footer class="py-6 bg-gray-100 mt-12">
+        <div class="flex justify-center px-8 text-center">
+            <div class="w-full px-8">
+                <h6>Vitrine</h6>
+                <p><b>SIRET</b></p>
+                <a href="">link</a>
+                <p>01 rue vitrine 75001 Paris</p>
+            </div>
+            <div class="w-full px-8">
+                <div class="flex flex-col">
+                    <a href="">groupefranceclean.fr</a>
+                    <a href="">link</a>
+                    <a href="">link</a>
+                    <a href="">link</a>
+                </div>
+            </div>
+        </div>
+        <p class="text-center pt-8"><a href="">Mention Légale</a> - Vitrine&copy;{{ date()|date('Y') }}</p>
+    </footer>
+    {% endblock %}
+</body>
+
+</html>

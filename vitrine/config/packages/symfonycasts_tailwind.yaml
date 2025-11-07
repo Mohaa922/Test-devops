@@ -1,0 +1,7 @@
+symfonycasts_tailwind:
+    # Specify the EXACT version of Tailwind CSS you want to use
+    binary_version: 'v4.1.11'
+    # one of: 'linux-arm64', 'linux-arm64-musl', 'linux-x64', 'linux-x64-musl', 'macos-arm64', 'macos-x64', 'windows-x64'
+    binary_platform: 'macos-arm64'
+    # Alternatively, you can specify the path to the binary that you manage yourself
+    #binary: 'node_modules/.bin/tailwindcss'

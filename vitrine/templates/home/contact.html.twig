@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://www.google.com/recaptcha/api.js"></script>
+{% endblock %}
+
+{% block body %}
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full px-8 h-screen pt-20">
+    <div class=" flex flex-col justify-center items-center">
+        <h1 class="text-4xl font-bold mb-3">Contactez-nous</h1>
+        <h2 class="text-2xl text-gray-600 mb-1">Laissez-nous un message</h2>
+        <p class="mt-3 text-gray-700 w-100 text-center">Que vous souhaitiez découvrir nos offres ou rechercher une
+            solution
+            spécifique,
+            nous serons ravis de vous aider. Contactez-nous et nous vous orienterons.</p>
+            <a href="tel:+1234567890"
+                class="flex items-center justify-center bg-blue-600 text-white py-3 px-6 rounded-b-full rounded-tr-full hover:bg-blue-700 transition duration-300 mt-3">Appelez-nous</a>
+    </div>
+
+    <div class="flex flex-col justify-center items-center">
+        {{ form_start(form, {'attr': {'class': 'w-5/6 bg-[#D9EBFF] rounded-2xl px-8 pt-6 pb-8 mb-4'}}) }}
+        {{ form_widget(form) }}
+        <div class="mt-4 text-center">
+            <button type="submit"
+                class="g-recaptcha w-3/6 m-auto bg-blue-600 text-white py-3 px-6 rounded-b-full rounded-tr-full hover:bg-blue-700 "
+                data-sitekey="{{recaptcha_public_key}}" data-callback='onSubmit' data-action='submit'>Envoyer</button>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</section>
+<script>
+    function onSubmit(token) {
+        document.querySelector("form").submit();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,390 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let animationLaunched = false;
+
+        window.addEventListener('scroll', () => {
+            if (animationLaunched) return;
+
+            const div = document.querySelector('#statistiques');
+            if (!div) return;
+
+            const rect = div.getBoundingClientRect();
+            if (Math.trunc(rect.top) < window.innerHeight && Math.trunc(rect.bottom) >= 0) {
+                animation();
+                animationLaunched = true;
+            }
+
+        });
+
+        document.querySelectorAll('a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                animationLaunched = false;
+            });
+        });
+        function animation() {
+            let stats = document.querySelectorAll('.statistique');
+            stats.forEach(stat => {
+                let start_value = 0;
+                let end_value = parseInt(stat.getAttribute('data-val'));
+                let duration = Math.floor(3000 / end_value);
+
+                let counter = setInterval(() => {
+                    start_value += 1;
+                    stat.textContent = start_value;
+                    if (start_value >= end_value) {
+                        stat.textContent = end_value;
+                        clearInterval(counter);
+                    }
+                }, duration);
+            });
+        }
+    });
+        </script>
+        {% endblock %}
+{% block body %}
+{## Section d'introduction ##}
+<section class="w-full h-[80vh] relative overflow-hidden">
+    <img src="https://placehold.co/600x400" alt="France Clean - Nettoyage professionnel"
+        class="w-full h-full object-cover absolute inset-0 blur-sm">
+
+    <div class="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+        <h1
+            class="text-shadow-md text-shadow-black/80 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 md:mb-4">
+            Bienvenue chez
+        </h1>
+        <h2
+            class="text-shadow-md text-shadow-black/80 text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] font-bold text-blue-600 mb-6 md:mb-8 leading-none">
+            France Clean
+        </h2>
+
+        <p
+            class="font-medium text-lg sm:text-xl md:text-2xl text-white mb-8 md:mb-12 max-w-2xl leading-relaxed text-shadow-xs text-shadow-black/80">
+            Votre partenaire de confiance pour un nettoyage professionnel
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md sm:max-w-lg">
+            <a href="#nos-services"
+                class="w-full sm:flex-1 bg-blue-600 text-white font-semibold py-4 px-8 rounded-b-full rounded-tr-full
+                       hover:bg-blue-700 transition duration-300 shadow-2xl transform hover:scale-105">
+                Nos services
+            </a>
+            <a href="{{ path('app_contact') }}"
+                class="w-full sm:flex-1 bg-white text-blue-600 font-semibold py-4 px-8 rounded-b-full rounded-tr-full 
+                       hover:bg-blue-600 hover:text-white transition duration-300 shadow-2xl transform hover:scale-105 text-center">
+                Contactez-nous
+            </a>
+        </div>
+    </div>
+</section>
+
+{## Section a propos ##}
+<section id="a-propos" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 pt-8 px-6 gap-3">
+    <div class="w-full h-full flex justify-center items-center">
+        <img src="https://placehold.co/600x400" alt="" class="w-3/4 h-2/4 lg:h-full object-cover rounded-2xl shadow-lg">
+    </div>
+    <div class="flex flex-col justify-center items-center w-full px-4 md:px-8">
+        <h2 class="md:text-5xl text-3xl font-medium tracking-tight">À Propos</h2>
+        <p class="mt-6 md:text-xl text-gray-600 leading-8 text-center">Lorem ipsum, dolor sit amet consectetur
+            adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Fuga et illum fugit. Saepe maiores omnis ducimus dignissimos nisi suscipit nesciunt nihil ipsa quos placeat
+            doloribus atque modi, fugiat, voluptate iure.</p>
+    </div>
+</section>
+
+{## Section Services ##}
+<section id="nos-services" class="mx-auto max-w-8/10 pt-8 px-6">
+    <div class="">
+        <div class="mx-auto max-w-4xl sm:text-center">
+            <h2 class="md:text-5xl text-3xl font-medium tracking-tight">Nos Services</h2>
+            <p class="mt-6 md:text-xl text-gray-600 leading-8">Voici les services que nous proposons :</p>
+        </div>
+
+        <div class="grid xl:grid-cols-4 md:grid-cols-2 grid-cols-2 mx-auto gap-4 my-10 ">
+            <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center mb-6">
+                        <!-- svg icon -->
+                        <svg class="h-20 w-20 mx-auto fill-purple-500 " xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
+                            viewBox="0 0 512 512" id="delivery-truck">
+                            <path
+                                d="M472.3,221.3l-59.1-54.7A69.906,69.906,0,0,0,365.7,148H335.5v-6.1a50.018,50.018,0,0,0-50-50H67.2a50.018,50.018,0,0,0-50,50V365.8a10.029,10.029,0,0,0,10,10H58.4a53.141,53.141,0,0,0,104.8,0H349.4a53.141,53.141,0,0,0,104.8,0h30.5a10.029,10.029,0,0,0,10-10V272.7A69.617,69.617,0,0,0,472.3,221.3ZM458.7,236H399.5V181.2l.1.1ZM67.2,111.9H285.5a30.088,30.088,0,0,1,30,30V178h0v78.4h0v1.4H37.2V141.9A30.088,30.088,0,0,1,67.2,111.9Zm43.6,288.2A33.1,33.1,0,1,1,143.9,367,33.139,33.139,0,0,1,110.8,400.1Zm0-86.3a53.282,53.282,0,0,0-52,42H37.2v-78H315.5v78H162.8A53.2,53.2,0,0,0,110.8,313.8Zm291,86.3A33.1,33.1,0,1,1,434.9,367,33.139,33.139,0,0,1,401.8,400.1Zm73-44.3h-21a53.19,53.19,0,0,0-104,0H335.5V256.4h0V168h30.2a52.829,52.829,0,0,1,13.8,1.9V236a20.059,20.059,0,0,0,20,20h72.4a49.287,49.287,0,0,1,2.9,16.7Z">
+                            </path>
+                            <path
+                                d="M110.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 110.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 110.8 375.4zM401.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 401.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 401.8 375.4zM155.3 212.4a9.993 9.993 0 0 0 7.1 3h0a10.327 10.327 0 0 0 7.1-2.9l48.1-48.1a9.97 9.97 0 0 0-14.1-14.1l-41 41L142.6 171a9.97 9.97 0 1 0-14.2 14z">
+                            </path>
+                        </svg>
+                    </div>
+                    
+                    <div class="text-center">
+                        <h5 class="text-2xl font-medium mb-4">Service 1</h5>
+                        <p class="font-medium text-sm text-gray-500">Lorem ipsum dolor, sit amet
+                            consectetur adipisicing elit. Perspiciatis error</p>
+                        </div>
+                        </div>
+                        </div>
+                        <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                            <div class="p-6">
+                                <div class="flex items-center justify-center mb-6">
+                                    <!-- svg icon -->
+                                    <svg class="h-20 w-20 mx-auto fill-purple-500" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
+                                        viewBox="0 0 512 512" id="delivery-truck">
+                                        <path
+                                            d="M472.3,221.3l-59.1-54.7A69.906,69.906,0,0,0,365.7,148H335.5v-6.1a50.018,50.018,0,0,0-50-50H67.2a50.018,50.018,0,0,0-50,50V365.8a10.029,10.029,0,0,0,10,10H58.4a53.141,53.141,0,0,0,104.8,0H349.4a53.141,53.141,0,0,0,104.8,0h30.5a10.029,10.029,0,0,0,10-10V272.7A69.617,69.617,0,0,0,472.3,221.3ZM458.7,236H399.5V181.2l.1.1ZM67.2,111.9H285.5a30.088,30.088,0,0,1,30,30V178h0v78.4h0v1.4H37.2V141.9A30.088,30.088,0,0,1,67.2,111.9Zm43.6,288.2A33.1,33.1,0,1,1,143.9,367,33.139,33.139,0,0,1,110.8,400.1Zm0-86.3a53.282,53.282,0,0,0-52,42H37.2v-78H315.5v78H162.8A53.2,53.2,0,0,0,110.8,313.8Zm291,86.3A33.1,33.1,0,1,1,434.9,367,33.139,33.139,0,0,1,401.8,400.1Zm73-44.3h-21a53.19,53.19,0,0,0-104,0H335.5V256.4h0V168h30.2a52.829,52.829,0,0,1,13.8,1.9V236a20.059,20.059,0,0,0,20,20h72.4a49.287,49.287,0,0,1,2.9,16.7Z">
+                                        </path>
+                                        <path
+                                            d="M110.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 110.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 110.8 375.4zM401.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 401.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 401.8 375.4zM155.3 212.4a9.993 9.993 0 0 0 7.1 3h0a10.327 10.327 0 0 0 7.1-2.9l48.1-48.1a9.97 9.97 0 0 0-14.1-14.1l-41 41L142.6 171a9.97 9.97 0 1 0-14.2 14z">
+                                        </path>
+                                    </svg>
+                                    
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <h5 class="text-2xl font-medium mb-4">Service 2</h5>
+                        <p class="font-medium text-sm text-gray-500">Lorem ipsum dolor, sit amet
+                            consectetur adipisicing elit. Perspiciatis error</p>
+                        </div>
+                        </div>
+                        </div>
+                        <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                            <div class="p-6">
+                                <div class="flex items-center justify-center mb-6">
+                                    <!-- svg icon -->
+                                    <svg class="h-20 w-20 mx-auto fill-purple-500" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
+                                        viewBox="0 0 512 512" id="delivery-truck">
+                                        <path
+                                            d="M472.3,221.3l-59.1-54.7A69.906,69.906,0,0,0,365.7,148H335.5v-6.1a50.018,50.018,0,0,0-50-50H67.2a50.018,50.018,0,0,0-50,50V365.8a10.029,10.029,0,0,0,10,10H58.4a53.141,53.141,0,0,0,104.8,0H349.4a53.141,53.141,0,0,0,104.8,0h30.5a10.029,10.029,0,0,0,10-10V272.7A69.617,69.617,0,0,0,472.3,221.3ZM458.7,236H399.5V181.2l.1.1ZM67.2,111.9H285.5a30.088,30.088,0,0,1,30,30V178h0v78.4h0v1.4H37.2V141.9A30.088,30.088,0,0,1,67.2,111.9Zm43.6,288.2A33.1,33.1,0,1,1,143.9,367,33.139,33.139,0,0,1,110.8,400.1Zm0-86.3a53.282,53.282,0,0,0-52,42H37.2v-78H315.5v78H162.8A53.2,53.2,0,0,0,110.8,313.8Zm291,86.3A33.1,33.1,0,1,1,434.9,367,33.139,33.139,0,0,1,401.8,400.1Zm73-44.3h-21a53.19,53.19,0,0,0-104,0H335.5V256.4h0V168h30.2a52.829,52.829,0,0,1,13.8,1.9V236a20.059,20.059,0,0,0,20,20h72.4a49.287,49.287,0,0,1,2.9,16.7Z">
+                                        </path>
+                                        <path
+                                            d="M110.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 110.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 110.8 375.4zM401.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 401.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 401.8 375.4zM155.3 212.4a9.993 9.993 0 0 0 7.1 3h0a10.327 10.327 0 0 0 7.1-2.9l48.1-48.1a9.97 9.97 0 0 0-14.1-14.1l-41 41L142.6 171a9.97 9.97 0 1 0-14.2 14z">
+                                        </path>
+                                    </svg>
+                                    
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <h5 class="text-2xl font-medium mb-4">Service 3</h5>
+                        <p class="font-medium text-sm text-gray-500">Lorem ipsum dolor, sit amet
+                            consectetur adipisicing elit. Perspiciatis error</p>
+                        </div>
+                        </div>
+                        </div>
+                        <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                            <div class="p-6">
+                                <div class="flex items-center justify-center mb-6">
+                                    <!-- svg icon -->
+                                    <svg class="h-20 w-20 mx-auto fill-purple-500" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
+                                        viewBox="0 0 512 512" id="delivery-truck">
+                                        <path
+                                            d="M472.3,221.3l-59.1-54.7A69.906,69.906,0,0,0,365.7,148H335.5v-6.1a50.018,50.018,0,0,0-50-50H67.2a50.018,50.018,0,0,0-50,50V365.8a10.029,10.029,0,0,0,10,10H58.4a53.141,53.141,0,0,0,104.8,0H349.4a53.141,53.141,0,0,0,104.8,0h30.5a10.029,10.029,0,0,0,10-10V272.7A69.617,69.617,0,0,0,472.3,221.3ZM458.7,236H399.5V181.2l.1.1ZM67.2,111.9H285.5a30.088,30.088,0,0,1,30,30V178h0v78.4h0v1.4H37.2V141.9A30.088,30.088,0,0,1,67.2,111.9Zm43.6,288.2A33.1,33.1,0,1,1,143.9,367,33.139,33.139,0,0,1,110.8,400.1Zm0-86.3a53.282,53.282,0,0,0-52,42H37.2v-78H315.5v78H162.8A53.2,53.2,0,0,0,110.8,313.8Zm291,86.3A33.1,33.1,0,1,1,434.9,367,33.139,33.139,0,0,1,401.8,400.1Zm73-44.3h-21a53.19,53.19,0,0,0-104,0H335.5V256.4h0V168h30.2a52.829,52.829,0,0,1,13.8,1.9V236a20.059,20.059,0,0,0,20,20h72.4a49.287,49.287,0,0,1,2.9,16.7Z">
+                                        </path>
+                                        <path
+                                            d="M110.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 110.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 110.8 375.4zM401.8 338.5a28.4 28.4 0 1 0 28.4 28.4A28.445 28.445 0 0 0 401.8 338.5zm0 36.9a8.4 8.4 0 1 1 8.4-8.4A8.451 8.451 0 0 1 401.8 375.4zM155.3 212.4a9.993 9.993 0 0 0 7.1 3h0a10.327 10.327 0 0 0 7.1-2.9l48.1-48.1a9.97 9.97 0 0 0-14.1-14.1l-41 41L142.6 171a9.97 9.97 0 1 0-14.2 14z">
+                                        </path>
+                                    </svg>
+                                    
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <h5 class="text-2xl font-medium mb-4">Service 3</h5>
+                        <p class="font-medium text-sm text-gray-500">Lorem ipsum dolor, sit amet
+                            consectetur adipisicing elit. Perspiciatis error</p>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        </section>
+                        {## Statistiques ##}
+<section class="mx-auto max-w-7xl py-10 px-6" id="statistiques">
+    <article class="grid sm:grid-cols-1 lg:grid-cols-3 gap-y-20 gap-x-5">
+        <div class="flex flex-col justify-center items-center">
+            <h2 class="text-4xl lg:text-6xl text-black font-bold text-center mt-5">+<span class="statistique"
+                    data-val="98">0</span>%</h2>
+            <h3 class="text-2xl text-black font-semibold text-center lg:mt-6">Satisfaction</h3>
+            <p class="text-18px font-normal text-gray-500 text-center text-opacity-50 mt-2">Our clients are highly
+                satisfied with our services.</p>
+            </div>
+            <div class="flex flex-col justify-center items-center">
+            <h2 class="text-4xl lg:text-6xl text-black font-bold text-center mt-5">+<span class="statistique"
+                    data-val="400">0</span></h2>
+            <h3 class="text-2xl text-black font-semibold text-center lg:mt-6">Clients</h3>
+            <p class="text-18px font-normal text-gray-500 text-center text-opacity-50 mt-2">We have served over 400
+                clients.</p>
+            </div>
+            <div class="flex flex-col justify-center items-center">
+            <h2 class="text-4xl lg:text-6xl text-black font-bold text-center mt-5">+<span class="statistique" data-val="15">0</span>
+            </h2>
+            <h3 class="text-2xl text-black font-semibold text-center lg:mt-6">Ans d'expérience</h3>
+            <p class="text-18px font-light text-gray-500 text-center text-opacity-50 mt-2">15 years of experience in
+                the
+                industry.</p>
+        </div>
+    </article>
+</section>
+{## Section Partenaires ##}
+<section class="w-full max-w-5xl mx-auto px-4 md:px-6 pt-8 pb-8">
+    <div class="text-center">
+        <h2 class="md:text-5xl text-3xl font-medium tracking-tight mb-15">Nos Partenaires</h2>
+        <div class="w-full inline-flex flex-nowrap overflow-hidden mask-x-from-70% mask-x-to-100%">
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll">
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 1" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 2" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 3" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 4" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 5" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 6" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 7" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 8" class="w-30 h-20" />
+                </li>
+            </ul>
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll">
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 1" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 2" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 3" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 4" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 5" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 6" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 7" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 8" class="w-30 h-20" />
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+{## Section Nos équipes ##}
+
+<section id="nos-equipes" class="mx-auto max-w-8/10 pt-8 px-6">
+    <div class="">
+        <div class="mx-auto max-w-4xl sm:text-center">
+            <h2 class="md:text-5xl text-3xl font-medium tracking-tight">L'équipe derrière chaque projet</h2>
+        </div>
+
+        <div class="grid xl:grid-cols-4 md:grid-cols-2 grid-cols-2 mx-auto gap-4 my-10">
+            <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                <div class="">
+                    <div class="flex items-center justify-center">
+                        <img src="https://placehold.co/150x150" alt="Membre de l'équipe"
+                            class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="">
+                        <h5 class="text-lg font-medium uppercase">Prenom Nom</h5>
+                        <p class="font-medium text-sm text-gray-500 uppercase">Role</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                <div class="">
+                    <div class="flex items-center justify-center">
+                        <img src="https://placehold.co/150x150" alt="Membre de l'équipe"
+                            class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="">
+                        <h5 class="text-lg font-medium uppercase">Prenom Nom</h5>
+                        <p class="font-medium text-sm text-gray-500 uppercase">Role</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                <div class="">
+                    <div class="flex items-center justify-center">
+                        <img src="https://placehold.co/150x150" alt="Membre de l'équipe"
+                            class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="">
+                        <h5 class="text-lg font-medium uppercase">Prenom Nom</h5>
+                        <p class="font-medium text-sm text-gray-500 uppercase">Role</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border border-gray-300 rounded-2xl p-4 hover:scale-105 transition-transform duration-300">
+                <div class="">
+                    <div class="flex items-center justify-center">
+                        <img src="https://placehold.co/150x150" alt="Membre de l'équipe"
+                            class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="">
+                        <h5 class="text-lg font-medium uppercase">Prenom Nom</h5>
+                        <p class="font-medium text-sm text-gray-500 uppercase">Role</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{## Section Nous contacter ##}
+
+<section class="mx-auto max-w-8/10  pt-8 px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="flex w-full justify-center items-center p-4">
+            <!-- Google Maps -->
+            <div class="w-5/6 h-100 rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2622.182070176662!2d2.2790695000000003!3d48.9119233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e69d4aef228401%3A0x4d71d1db41a8b5da!2sFrance%20Clean!5e0!3m2!1sfr!2sfr!4v1761040117981!5m2!1sfr!2sfr"
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <div class="flex flex-col items-center justify-center p-8 w-5/6 mx-auto text-center">
+            <h3 class="text-xl font-semibold text-indigo-800 mb-4">Contactez-nous</h3>
+            <p class="text-indigo-800 mb-6">Vous avez des questions ou souhaitez en savoir plus sur nos services ?
+                N'hésitez pas à nous contacter via le formulaire ci-dessous.</p>
+            <a href="{{ path('app_contact') }}"
+                class=" shadow-xl shadow-dark text-15px text-white font-medium bg-blue-600 py-5 px-9 mt-2 rounded-b-full rounded-tr-full w-fit transform hover:scale-105 transition-transform duration-300">contactez-nous</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

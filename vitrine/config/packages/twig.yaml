@@ -1,0 +1,9 @@
+twig:
+    globals:
+        recaptcha_public_key: '%app.recaptcha.publickey%'
+    file_name_pattern: '*.twig'
+    form_theme: ['tailwind_2_layout.html.twig']
+
+when@test:
+    twig:
+        strict_variables: true

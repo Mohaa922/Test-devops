@@ -1,0 +1,2 @@
+ux_map:
+    renderer: '%env(resolve:default::UX_MAP_DSN)%'

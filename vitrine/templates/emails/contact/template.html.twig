@@ -1,0 +1,14 @@
+{% extends "emails/base.html.twig" %}
+
+{% block body %}
+    <section>
+        <h1>Nouveau message</h1>
+        <article>
+            <h2><b><a href="mailto:{{ client_email }}">répondre : {{ client_email }}</a></b></h2>
+            <div>
+                <h3>{{ subject }}</h3>
+                <p>{{ message|nl2br }}</p>
+            </div>
+        </article>
+    </section>
+{% endblock %}

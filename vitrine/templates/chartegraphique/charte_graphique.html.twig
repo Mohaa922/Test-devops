@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}Charte Graphique{% endblock %}
+
+{% block body %}
+
+<section class="w-full h-full bg-white text-gray-900">
+    {% for chart in charts %}
+    <a href="{{path('app_charte_graphique_show', {id: chart.id})}}"> {{chart.name}}</a>
+    {% endfor %}
+    <div class="flex flex-col gap-12 py-12">
+        {## Couleurs ##}
+        <div class="w-6xl mx-auto p-6 bg-gray-50 rounded-lg">
+            <h2 class="text-2xl font-semibold mb-4">Couleurs</h2>
+            <div class="flex space-x-4 mb-8">
+                <div
+                    class="w-24 h-24 bg-blue-600 rounded-full shadow-md flex items-center justify-center text-white font-semibold">
+                    #1E40AF
+                </div>
+                <div
+                    class="w-24 h-24 bg-gray-800 rounded-full shadow-md flex items-center justify-center text-white font-semibold">
+                    #1F2937
+                </div>
+                <div
+                    class="w-24 h-24 bg-gray-500 rounded-full shadow-md flex items-center justify-center text-white font-semibold">
+                    #6B7280
+                </div>
+                <div
+                    class="w-24 h-24 bg-white rounded-full shadow-md flex items-center justify-center text-gray-800 font-semibold border border-gray-300">
+                    #FFFFFF
+                </div>
+            </div>
+        </div>
+        {## Boutons ##}
+        <div class="w-6xl mx-auto p-6 bg-gray-50 rounded-lg">
+            <h2 class="text-2xl font-semibold mb-4">Button</h2>
+            <div class="flex flex-col">
+                <twig:Button ButtonId="0" theme="1" />
+                <twig:Button ButtonId="1" theme="1" />
+                <twig:Button ButtonId="2" theme="1" />
+
+            </div>
+        </div>
+            <div class="w-6xl mx-auto p-6 bg-gray-50 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4">Example</h2>
+                {% for chart in charts %}
+                <a href="{{path('app_charte_graphique_show', {id: chart.id})}}"> {{chart.name}}</a>
+                {% endfor %}
+        </div>
+
+
+    </div>
+</section>
+{% block footer %}
+{% endblock %}
+{% endblock %}

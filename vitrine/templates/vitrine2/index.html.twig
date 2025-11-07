@@ -1,0 +1,534 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const buttonNav = document.getElementById('button_nav');
+            console.log(buttonNav);
+            buttonNav.classList.remove('rounded-b-full', 'rounded-tr-full');
+            buttonNav.classList.add('rounded-md');
+            const chiffresClesSection = document.getElementById('chiffres-cles');
+            const chiffresClesSectionOffsetTop = chiffresClesSection.offsetTop;
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY || window.pageYOffset;
+            if (scrollY > 50) {
+                navbar.classList.remove('w-full', 'p-2', 'px-6');
+                navbar.classList.add('w-3/4', 'mx-auto', 'mt-2', 'rounded-lg', 'shadow-lg', 'p-2',);
+            } else {
+                navbar.classList.remove('w-3/4', 'mx-auto', 'mt-2', 'shadow-lg', 'p-2');
+                navbar.classList.add('w-full', 'p-2', 'px-6');
+            }
+            if (chiffresClesSectionOffsetTop < scrollY + window.innerHeight) {
+                chiffresClesSection.classList.add('animate-fade-in-up');
+            }
+        });
+    });
+        </script>
+{% endblock %}
+
+{% block body %}
+{## Section d'accueil ##}
+<section class="w-full h-[80vh] bg-gray-100 grid grid-cols-2 place-items-center">
+    <div class="m-auto flex flex-col gap-6">
+        <h1 class="text-6xl font-bold mb-6 hidden-initially fade-in">Bienvenue sur la Vitrine 2</h1>
+        <p class="text-lg mb-4 hidden-initially fade-inRight">Ceci est une page d'exemple pour la vitrine 2 .</p>
+        <div class="flex gap-4">
+            <a href=""
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg ButtonReveal hover:bg-blue-700 transition">Contactez-nous</a>
+            <a href="" class="bg-blue-600 text-white ButtonReveal px-6 py-3 rounded-lg hover:bg-blue-700 transition">Nos
+                services</a>
+        </div>
+    </div>
+    <div class="m-auto">
+        <img src="https://placehold.co/600x400" alt="Image Vitrine 2"
+            class="w-full h-auto rounded-lg hidden-initially shadow-lg scalefade-in">
+    </div>
+</section>
+{## Section partenaires ##}
+<section class="w-full max-w-full  h-[20vh] bg-white hidden-initially scalefade-in">
+    <div class="mx-auto w-full h-full">
+        <div class="w-full h-full inline-flex flex-nowrap overflow-hidden mask-x-from-70% mask-x-to-100%">
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll">
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 1" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 2" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 3" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 4" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 5" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 6" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 7" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 8" class="w-30 h-20" />
+                </li>
+            </ul>
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll">
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 1" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 2" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 3" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 4" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 5" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 6" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 7" class="w-30 h-20" />
+                </li>
+                <li>
+                    <img src="https://placehold.co/300x200" alt="Partenaire 8" class="w-30 h-20" />
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+{## Section services ##}
+<section class="w-full max-w-full bg-white mb-[2em] ">
+    <div class="w-full h-full grid grid-cols-3 p-2 gap-2">
+        <div class="flex flex-col rounded-md hover:p-5 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+            <div class="w-full flex h-3/4">
+                <img src="https://placehold.co/100x100" alt="Service 1"
+                    class=" w-full h-full object-cover rounded-md" />
+            </div>
+            <div class="w-full h-1/4 mt-4 flex flex-col gap-2 items-start">
+                <h1 class="text-4xl font-bold">Service 1</h1>
+                <div class="flex justify-between w-80">
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="flex flex-col rounded-md hover:p-5 hover:bg-[#FBEFFF] duration-500 ease-in-out">
+            <div class="w-full flex h-3/4">
+                <img src="https://placehold.co/100x100" alt="Service 1" class=" w-full h-full object-cover rounded-md" />
+            </div>
+            <div class="w-full h-1/4 mt-4 flex flex-col gap-2 items-start">
+                <h1 class="text-4xl font-bold">Service 2</h1>
+                <div class="flex justify-between w-80">
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="flex flex-col rounded-md hover:p-5 hover:bg-[#E5F4E1] duration-500 ease-in-out">
+            <div class="w-full flex h-3/4">
+                <img src="https://placehold.co/100x100" alt="Service 1" class=" w-full h-full object-cover rounded-md" />
+            </div>
+            <div class="w-full h-1/4 mt-4 flex flex-col gap-2 items-start">
+                <h1 class="text-4xl font-bold">Service 3</h1>
+                <div class="flex justify-between w-80">
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                    <ul class="list-none">
+                        <li class="text-lg">Avantage 1</li>
+                        <li class="text-lg">Avantage 2</li>
+                        <li class="text-lg">Avantage 3</li>
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        </div>
+        </section>
+        {## Section chiffres clés ##}
+        <section class="w-full max-w-full h-[50vh] bg-[#1458E4] mb-4 hidden-initially" id="chiffres-cles">
+            <ul class="flex flex-col text-white h-full">
+                <li class="basis-1/3 flex justify-between border-b border-white p-3 items-end">
+                    <h2>Employés</h2>
+                    <h2 class="text-8xl font-bold">200</h2>
+                    <div class="flex items-center h-full w-auto">
+                        <img src="https://placehold.co/100x100" alt="" class=" h-full w-full object-cover">
+                    </div>
+
+        </li>
+        <li class="basis-1/3 flex justify-between border-b border-white p-3 items-end">
+            <h2>Projets réalisés</h2>
+            <h2 class="text-8xl font-bold">400+</h2>
+            <div class="flex items-center h-full w-auto">
+                <img src="https://placehold.co/100x100" alt="" class=" h-full w-full object-cover">
+            </div>
+        </li>
+        <li class="basis-1/3 flex justify-between border-b border-white p-3 items-end">
+            <h2>Satisfaction</h2>
+            <h2 class="text-8xl font-bold">98%</h2>
+            <div class="flex items-center h-full w-auto">
+                <img src="https://placehold.co/100x100" alt="" class=" h-full w-full object-cover">
+            </div>
+        </li>
+        </ul>
+        </section>
+        {## Section A propos ##}
+        <section class="w-full max-w-full bg-white mb-[2em] ">
+            <div class="w-full h-full p-4 grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-4 justify-center">
+                    <h1 class="text-5xl font-bold">À propos de nous</h1>
+                    <p class="text-lg">Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium ratione error quas
+                        voluptatum dignissimos. Voluptate reiciendis ut eius hic aperiam suscipit illum non odit, error quos
+                        dicta
+                        distinctio sed sit pariatur id! Quibusdam dolores hic, ipsam nulla omnis quaerat praesentium, numquam
+                        molestiae laboriosam totam magni qui consectetur adipisci dicta expedita laudantium, et quas
+                        perspiciatis id
+                        officiis mollitia. Consectetur tenetur illum tempore deserunt excepturi accusantium praesentium quae
+                        facere
+                        a quasi unde odio, cumque quibusdam odit magnam natus culpa velit asperiores sapiente fuga vel quod
+                        itaque.
+                        Temporibus nobis repellendus harum quidem soluta, aliquam magnam! Repellendus quae sont nobis quaerat!
+                        Incidunt, doloremque saepe. Iste incidunt dolores eum eaque, quos fuga neque magni. Quasi autem quos
+                        labore
+                        tempora sapiente ipsa harum, eveniet error, debitis illo mollitia delectus sed voluptates ullam cum eum
+                        atque sunt ipsam ea odio quidem consectetur? Consequuntur molestias vel accusamus repellendus nam
+                        quidem.
+                        Voluptatem incidunt dicta reprehenderit ea enim voluptatum eveniet reiciendis consequatur, quis
+                        laudantium
+                        tenetur minima totam cumque minus. Autem sapiente est quo voluptatum voluptate necessitatibus saepe,
+                        temporibus laborum quisquam adipisci molestias vitae, illo ipsum! Itaque provident voluptas nihil
+                        delectus
+                        voluptatem ab omnis praesentium ad est fuga blanditiis quas quod similique esse distinctio, sequi,
+                        perspiciatis vero architecto corrupti accusamus excepturi.
+                    </p>
+                </div>
+                <div class="w-full h-full flex justify-center items-center">
+                    <img src="https://placehold.co/600x400" alt="Image A propos"
+                        class="w-full h-auto rounded-lg  object-cover" />
+                </div>
+            </div>
+        </section>
+        {## Section equipe ##}
+        <section class="w-full max-w-full bg-white mb-[2em] ">
+            <div class="w-full h-full grid grid-cols-5 p-2 gap-2">
+                <div class="flex flex-col rounded-md hover:p-2 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+                    <div class="w-full flex h-4/5">
+                        <img src="https://placehold.co/100x100" alt="Service 1"
+                            class=" w-full h-full object-cover rounded-md" />
+                    </div>
+                    <div class="w-full h-1/5 mt-4 flex flex-col gap-2 items-start">
+                        <h1 class="text-4xl uppercase tracking-tight">Paul marlot</h1>
+                    </div>
+                </div>
+                <div class="flex flex-col rounded-md hover:p-2 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+                    <div class="w-full flex h-4/5">
+                        <img src="https://placehold.co/100x100" alt="Service 1"
+                            class=" w-full h-full object-cover rounded-md" />
+                    </div>
+                    <div class="w-full h-1/5 mt-4 flex flex-col gap-2 items-start">
+                        <h1 class="text-4xl uppercase tracking-tight">Paul marlot</h1>
+                    </div>
+                </div>
+                <div class="flex flex-col rounded-md hover:p-2 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+                    <div class="w-full flex h-4/5">
+                        <img src="https://placehold.co/100x100" alt="Service 1"
+                            class=" w-full h-full object-cover rounded-md" />
+                    </div>
+                    <div class="w-full h-1/5 mt-4 flex flex-col gap-2 items-start">
+                        <h1 class="text-4xl uppercase tracking-tight">Paul marlot</h1>
+                    </div>
+                </div>
+                <div class="flex flex-col rounded-md hover:p-2 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+                    <div class="w-full flex h-4/5">
+                        <img src="https://placehold.co/100x100" alt="Service 1"
+                            class=" w-full h-full object-cover rounded-md" />
+                    </div>
+                    <div class="w-full h-1/5 mt-4 flex flex-col gap-2 items-start">
+                        <h1 class="text-4xl uppercase tracking-tight">Paul marlot</h1>
+                    </div>
+                </div>
+                <div class="flex flex-col rounded-md hover:p-2 hover:bg-[#D5F2F6] duration-500 ease-in-out">
+                    <div class="w-full flex h-4/5">
+                        <img src="https://placehold.co/100x100" alt="Service 1"
+                            class=" w-full h-full object-cover rounded-md" />
+                    </div>
+                    <div class="w-full h-1/5 mt-4 flex flex-col gap-2 items-start">
+                        <h1 class="text-4xl uppercase tracking-tight">Paul marlot</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {## Section avis client ##}
+        <section class="w-full max-w-full bg-white mb-[2em] ">
+            <div class="mx-auto w-full h-full">
+                <div class="w-full h-full inline-flex flex-nowrap overflow-hidden">
+                    <ul x-ref="logoss"
+                        class="flex items-center justify-center md:justify-start [&_li]:mx-5 [&_img]:max-w-none animate-infinite-scroll">
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul x-ref="logoss"
+                        class="flex items-center justify-center md:justify-start [&_li]:mx-5 [&_img]:max-w-none animate-infinite-scroll">
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                        <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                            <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex items-center">
+                                    <img src="https://placehold.co/100x100" alt="Client A"
+                                        class="w-10 h-10 object-cover rounded-full" />
+                                </div>
+                                <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+</section>
+<section class="w-full max-w-full bg-white  ">
+    <div class="mx-auto w-full h-full">
+        <div class="w-full h-full inline-flex flex-nowrap overflow-hidden">
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-5 [&_img]:max-w-none animate-infinite-scroll-reverse">
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+            </ul>
+            <ul x-ref="logos"
+                class="flex items-center justify-center md:justify-start [&_li]:mx-5 [&_img]:max-w-none animate-infinite-scroll-reverse">
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+                <li class="flex flex-col justify-between bg-[#f1f8ff] rounded-3xl p-6 w-100 h-50 m-4">
+                    <p class="text-xl text-[#93979f]"> “Genie would be really great for prototyping brand ideas.”</p>
+                    <div class="flex gap-2 items-center">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/100x100" alt="Client A"
+                                class="w-10 h-10 object-cover rounded-full" />
+                        </div>
+                        <p class="text-md text-[#0a0d12]">Paul Marlot</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+</section>
+{## Section prise de contact ##}
+<section class="w-full h-auto">
+    <div class="m-auto flex flex-col justify-center items-center">
+        <h1 class="text-4xl text-center p-0">Prêt à faire le saut?</h1>
+        <p class="text-4xl mb-4 text-center">Discutons de votre prochain projet.</p>
+        <div class="flex gap-4 ">
+            <a href=""
+                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition">Contactez-nous</a>
+        </div>
+    </div>
+</section>
+
+<twig:Maps />
+{% endblock %}

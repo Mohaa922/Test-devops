@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+@theme {
+    /* chartes */
+    --color-dark-blue: #132332;
+    --color-blue: #011245;
+    --color-light-blue: #1d4388;
+    --color-grey: #d9d9d9;
+    /* logo */
+    --color-logo-sky-blue: #6b9de3;
+    --color-logo-light-blue: #4c72a1;
+    --color-logo-blue: #3d66c8;
+    --color-logo-dark-blue: #2e518b;
+}
+
+@keyframes infinite-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes infinite-scroll-reverse {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
+}
+.animate-infinite-scroll {
+    animation: infinite-scroll 35s linear infinite;
+    }
+    
+    .animate-infinite-scroll-reverse {
+        animation: infinite-scroll-reverse 45s linear infinite;
+}
+
+* {
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:
+        "wdth" 100;
+}
+
+/* Smooth scroll pour toute la page */
+html {
+    scroll-behavior: smooth;
+}
+
+.sucess {
+    background-color: #48bb78;
+    /* Vert pour succès */
+}
+
+.danger {
+    background-color: #f56565;
+    /* Rouge pour erreur */
+}
+@layer base {
+    .btn_base {
+        @apply py-3 px-6 transition duration-300;
+    }
+
+    .btn_b_blue {
+        @apply bg-white text-blue-600 border border-blue-600;
+    }
+
+}
+.trigger {
+    content: "";
+    width: 100px;
+    height: 30px;
+    background-color: white;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 50;
+}
+.fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.fade-inRight {
+    animation: fadeInRight 1s ease-out forwards;
+}
+
+.scalefade-in {
+    animation: scalefadeIn 1s ease-out forwards;
+}
+
+.ButtonReveal {
+    animation: ButtonReveal 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scalefadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes ButtonReveal {
+    0% {
+        clip-path: inset(0 100% 0 0);
+    }
+
+    100% {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 2s ease-out forwards;
+}
+
+.hidden-initially {
+    opacity: 0;
+}
+
+#navbar {
+    transition: all 0.7s ease;
+}
