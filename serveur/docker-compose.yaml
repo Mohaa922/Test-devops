@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: vitrine2-app
+    build:
+      context: ..                 # <— repo root (contains /vitrine and /serveur)
+      dockerfile: serveur/app/Dockerfile
+    ports:
+      - "8081:80"
+    environment:
+      APP_ENV: dev
+      APP_SECRET: demo_local_secret_please_change
+      DATABASE_URL: "mysql://symfony:symfony@mysql:3306/symfony?serverVersion=8.4.7&charset=utf8mb4"
+      MAILER_DSN: "smtp://mailer:1025"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+      APP_RUNTIME_DISABLE_DOTENV: "1"
+    volumes:
+      - ../vitrine:/var/www/html:rw,delegated
+      - app_var:/var/www/html/var
+      - app_uploads:/var/www/html/public/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    container_name: vitrine2-mysql
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    container_name: vitrine2-phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: symfony
+      PMA_PASSWORD: symfony
+      UPLOAD_LIMIT: 100M
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  app_var:
+  app_uploads:
