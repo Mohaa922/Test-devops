@@ -23,6 +23,8 @@ RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \
  && sed -i "/DocumentRoot/a \\\t<Directory ${APACHE_DOCUMENT_ROOT}>\\n\\tAllowOverride All\\n\\tRequire all granted\\n\\t</Directory>" \
       /etc/apache2/sites-available/000-default.conf
 
+# Forcer la plateforme du binaire Tailwind (évite macOS-arm64 dans un conteneur Linux)
+ENV TAILWINDCSS_PLATFORM=linux-x64
 
 WORKDIR /var/www/html
 
@@ -33,7 +35,7 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-
 # Code applicatif
 COPY vitrine/ .
 
-# Variables par défaut (sans DB ici)
+# Variables par défaut
 ENV APP_ENV=prod \
     APP_DEBUG=0 \
     APP_RUNTIME_DISABLE_DOTENV=1
