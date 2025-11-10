@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "symfony/debug-bundle": "^7.3"
+    }
+}
