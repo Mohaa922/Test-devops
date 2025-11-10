@@ -15,6 +15,7 @@ services:
       MAILER_DSN: "smtp://mailer:1025"
       MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
       APP_RUNTIME_DISABLE_DOTENV: "1"
+      TAILWINDCSS_PLATFORM: "linux-x64"   #  force le bon binaire
     volumes:
       - ../vitrine:/var/www/html:rw,delegated
       - app_var:/var/www/html/var
