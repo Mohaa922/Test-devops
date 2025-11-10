@@ -4,17 +4,18 @@ services:
   app:
     container_name: vitrine2-app
     build:
-      context: ..                 # <— repo root (contains /vitrine and /serveur)
+      context: ..                 # <— repo root (contient /vitrine et /serveur)
       dockerfile: serveur/app/Dockerfile
     ports:
       - "8081:80"
     environment:
-      APP_ENV: dev
+      APP_ENV: prod
       APP_SECRET: demo_local_secret_please_change
       DATABASE_URL: "mysql://symfony:symfony@mysql:3306/symfony?serverVersion=8.4.7&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
       MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
       APP_RUNTIME_DISABLE_DOTENV: "1"
+      TAILWINDCSS_PLATFORM: "linux-x64"   #  force le bon binaire
     volumes:
       - ../vitrine:/var/www/html:rw,delegated
       - app_var:/var/www/html/var

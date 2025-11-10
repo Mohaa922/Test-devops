@@ -1,84 +1,112 @@
 pipeline {
   agent any
+
+  options {
+    timestamps()
+  }
+
   environment {
-    DOCKER_BUILDKIT = '1'
-    COMPOSE_DOCKER_CLI_BUILD = '1'
-    // File Compose + .env (projet=serveur)
-    COMPOSE = 'docker compose -f serveur/docker-compose.yaml --env-file serveur/.env.compose'
+    DOCKER_BUILDKIT            = '1'
+    COMPOSE_DOCKER_CLI_BUILD   = '1'
+    // chemins côté Windows pour Jenkins
+    COMPOSE_FILE               = 'serveur\\docker-compose.yaml'
+    COMPOSE_ENV                = 'serveur\\.env.compose'
   }
 
   stages {
-    stage('Checkout') { steps { checkout scm } }
 
-    stage('Preflight: workspace') {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    // Nettoyage complet optionnel (décommente si besoin)
+    // stage('Clean local Docker environment') {
+    //   steps {
+    //     bat '''
+    //       echo === Nettoyage Docker local ===
+    //       docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% down -v --remove-orphans || ver >NUL
+    //       echo Supprime tous les conteneurs...
+    //       for /f "delims=" %%i in ('docker ps -aq') do docker rm -f %%i 2>NUL
+    //       echo Supprime toutes les images...
+    //       for /f "delims=" %%i in ('docker images -q') do docker rmi -f %%i 2>NUL
+    //       echo Supprime les volumes non utilises...
+    //       docker volume prune -f
+    //       echo Supprime les reseaux non utilises...
+    //       docker network prune -f
+    //       echo Nettoyage termine.
+    //     '''
+    //   }
+    // }
+
+    stage('Compose: build & up') {
       steps {
         bat '''
-          echo ==== Workspace tree (top) ====
-          dir /b
-          echo ==== vitrine presence check ====
-          if not exist vitrine\\bin\\console (
-            echo [ERROR] vitrine\\bin\\console absent du workspace. Assure-toi que le repo contient vitrine/.
-            exit /b 1
-          )
-          dir /b vitrine\\bin
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% pull
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% build
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% up -d
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
         '''
       }
     }
 
-    stage('Compose: build & up'){
+    stage('Wait for MySQL') {
       steps {
         bat '''
-          %COMPOSE% build
-          %COMPOSE% up -d
-          %COMPOSE% ps
-        '''
-      }
-    }
-
-    stage('DB ready'){
-      steps {
-        bat '''
-          echo Attente de MySQL...
-          for /l %%i in (1,1,40) do (
-            %COMPOSE% exec -T mysql sh -lc "mysql -usymfony -psymfony -e 'SELECT 1'" && goto :ready
+          echo Waiting for MySQL...
+          for /L %%i in (1,1,60) do (
+            docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T mysql sh -lc "mysql -hmysql -usymfony -psymfony -e 'SELECT 1'" && goto :ready
             timeout /t 2 >NUL
           )
-          echo [ERROR] MySQL indisponible
-          exit /b 1
+          echo MySQL not ready after timeout & exit /b 1
           :ready
-          echo MySQL OK
+          echo MySQL is ready!
         '''
       }
     }
 
-    stage('Preflight: bin/console in container') {
+    stage('Composer install (APP_ENV=prod)') {
       steps {
         bat '''
-          %COMPOSE% exec -T app sh -lc "pwd; ls -la; test -f bin/console || (echo '❌ bin/console manquant dans /var/www/html'; exit 1)"
+          set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          set "SYMFONY_DIR=/var/www/html"
+
+          REM IMPORTANT: forcer l'env PROD pour composer et le cache:clear auto
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w %SYMFONY_DIR% app composer install --no-dev --prefer-dist --no-interaction --no-progress
+
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php %SYMFONY_DIR%/bin/console about
         '''
       }
     }
 
-    stage('Migrations & assets'){
+    stage('Migrations & assets (APP_ENV=prod)') {
       steps {
         bat '''
-          rem Migrations (si aucune, continuer)
-          %COMPOSE% exec -T app sh -lc "php bin/console doctrine:migrations:migrate -n" || ver >NUL
+          set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          set "SYMFONY_DIR=/var/www/html"
 
-          rem Asset Map
-          %COMPOSE% exec -T app sh -lc "php bin/console asset-map:compile"
+          REM (debug) voir les binaires Symfony
+          %COMPOSE% exec -T app sh -lc "pwd; ls -la %SYMFONY_DIR%/bin"
 
-          rem Tailwind (tolérant si pas nécessaire)
-          %COMPOSE% exec -T app sh -lc "php bin/console tailwind:build" || ver >NUL
+          REM migrations (si aucune, ignorer l’erreur)
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w %SYMFONY_DIR% app php bin/console doctrine:migrations:migrate -n || ver >NUL
+
+          REM --- Tailwind : purge + download (linux-x64) + build ---
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w %SYMFONY_DIR% app sh -lc "rm -rf var/tailwind || true"
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w %SYMFONY_DIR% app php bin/console tailwind:build
+
+          REM --- Ensuite, compilation des assets ---
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w %SYMFONY_DIR% app php bin/console asset-map:compile
         '''
       }
     }
 
-    stage('Smoke test'){
+    stage('Smoke test') {
       steps {
         bat '''
-          %COMPOSE% ps
-          %COMPOSE% exec -T app sh -lc "php bin/console dbal:run-sql \\\"SELECT 1\\\"" 
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
         '''
       }
     }
@@ -86,8 +114,11 @@ pipeline {
 
   post {
     always {
-      bat '%COMPOSE% logs --no-color > compose.log || ver >NUL'
-      archiveArtifacts artifacts: 'compose.log', fingerprint: false
+      bat '''
+        docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
+        docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% logs --no-color > compose.log || ver >NUL
+      '''
+      archiveArtifacts artifacts: 'compose.log', allowEmptyArchive: true
     }
   }
 }
