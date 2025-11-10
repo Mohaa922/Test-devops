@@ -36,8 +36,8 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-
 COPY vitrine/ .
 
 # Variables par défaut
-ENV APP_ENV=prod \
-    APP_DEBUG=0 \
+ENV APP_ENV=dev \
+    APP_DEBUG=1 \
     APP_RUNTIME_DISABLE_DOTENV=1
 
 # Optimisations & permissions
