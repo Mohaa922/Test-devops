@@ -74,9 +74,9 @@ pipeline {
           echo %APP_ENV%
 
           REM IMPORTANT: forcer l'env PROD pour composer et le cache:clear auto
-          %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app composer install --no-dev --prefer-dist --no-interaction --no-progress
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 -w %SYMFONY_DIR% app composer install --no-dev --prefer-dist --no-interaction --no-progress
 
-          %COMPOSE% exec -T -env-file COMPOSE_ENV app php %SYMFONY_DIR%/bin/console about
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 app php %SYMFONY_DIR%/bin/console about
         '''
       }
     }
@@ -91,14 +91,14 @@ pipeline {
           %COMPOSE% exec -T app sh -lc "pwd; ls -la %SYMFONY_DIR%/bin"
 
           REM migrations (si aucune, ignorer l’erreur)
-          %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app php bin/console doctrine:migrations:migrate -n || ver >NUL
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console doctrine:migrations:migrate -n || ver >NUL
 
           REM --- Tailwind : purge + download (linux-x64) + build ---
-          %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app sh -lc "rm -rf var/tailwind || true"
-          %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app php bin/console tailwind:build
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 -w %SYMFONY_DIR% app sh -lc "rm -rf var/tailwind || true"
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console tailwind:build
 
           REM --- Ensuite, compilation des assets ---
-          %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app php bin/console asset-map:compile
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console asset-map:compile
         '''
       }
     }
@@ -107,7 +107,7 @@ pipeline {
       steps {
         bat '''
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
-          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T -env-file COMPOSE_ENV app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T -e APP_ENV=prod -e APP_DEBUG=1 app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
         '''
       }
     }
