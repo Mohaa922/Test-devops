@@ -65,7 +65,7 @@ pipeline {
         '''
       }
     }
-
+ 
     stage('Composer install (APP_ENV=dev)') {
       steps {
         bat '''
@@ -74,13 +74,13 @@ pipeline {
           echo %APP_ENV%
 
           REM IMPORTANT: forcer l'env DEV pour composer et le cache:clear auto
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app composer install --no-dev --prefer-dist --no-interaction --no-progress
-
+          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app composer install 
+          
           %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 app php %SYMFONY_DIR%/bin/console about
         '''
       }
     }
-
+// --no-dev --prefer-dist --no-interaction --no-progress
     stage('Migrations & assets (APP_ENV=dev)') {
       steps {
         bat '''
