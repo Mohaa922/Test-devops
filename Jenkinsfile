@@ -42,7 +42,7 @@ pipeline {
       steps {
         bat '''
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never pull
-          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never build
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never build --no-cache
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never up -d
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never ps
         '''
@@ -53,7 +53,7 @@ pipeline {
       steps {
         bat '''
           echo Waiting for MySQL...
-          for /L %%i in (1,1,40) do (
+          for /L %%i in (1,1,60) do (
             docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never exec -T mysql sh -lc "mysql -usymfony -psymfony -e 'SELECT 1'" && goto :ready
             timeout /t 2 >NUL
           )
@@ -68,9 +68,11 @@ pipeline {
       steps {
         bat '''
           set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never
+          set SYMFONY_DIR=/var/www/html
+
           REM IMPORTANT: forcer l’env PROD pour composer et le cache:clear auto
-          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w /var/www/html app composer install --no-dev --prefer-dist --no-interaction --no-progress
-          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php /var/www/html/bin/console about
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app composer install --no-dev --prefer-dist --no-interaction --no-progress
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php !SYMFONY_DIR!/bin/console about
         '''
       }
     }
@@ -79,18 +81,18 @@ pipeline {
       steps {
         bat '''
           set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never
+          set SYMFONY_DIR=/var/www/html
 
           REM (debug) voir les binaires
-          %COMPOSE% exec -T app sh -lc "pwd; ls -la /var/www/html/bin"
+          %COMPOSE% exec -T app sh -lc "pwd; ls -la !SYMFONY_DIR!/bin"
 
           REM migrations (si aucune, ignorer l’erreur)
-          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w /var/www/html app php /var/www/html/bin/console doctrine:migrations:migrate -n || ver >NUL
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app php bin/console doctrine:migrations:migrate -n || ver >NUL
 
-          REM asset mapper
-          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w /var/www/html app php /var/www/html/bin/console asset-map:compile
-
-          REM tailwind
-          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w /var/www/html app sh -lc "TAILWINDCSS_PLATFORM=linux-x64 php /var/www/html/bin/console tailwind:build || true"
+          REM --- Tailwind d'abord, puis asset mapper (et purge le cache binaire) ---
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app sh -lc "rm -rf var/tailwind || true"
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app sh -lc "TAILWINDCSS_PLATFORM=linux-x64 php bin/console tailwind:build || true"
+          %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app php bin/console asset-map:compile
         '''
       }
     }
