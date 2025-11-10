@@ -16,12 +16,13 @@ RUN set -eux; \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Apache -> /public + AllowOverride
+# Apache -> /public + AllowOverride 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \
       /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf \
- && sed -i '/DocumentRoot/a \\\t<Directory ${APACHE_DOCUMENT_ROOT}>\\n\\tAllowOverride All\\n\\tRequire all granted\\n\\t</Directory>' \
+ && sed -i "/DocumentRoot/a \\\t<Directory ${APACHE_DOCUMENT_ROOT}>\\n\\tAllowOverride All\\n\\tRequire all granted\\n\\t</Directory>" \
       /etc/apache2/sites-available/000-default.conf
+
 
 WORKDIR /var/www/html
 
