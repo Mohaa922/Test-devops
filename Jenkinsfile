@@ -3,8 +3,8 @@ pipeline {
   options { timestamps() }
 
   parameters {
-    string(name: 'COMPOSE_PROFILES', defaultValue: 'prod', description: 'Profiles docker-compose (dev, prod)')
-    booleanParam(name: 'HARD_CLEAN', defaultValue: false, description: 'Nettoyage complet Docker (danger sur un agent partagé)')
+    string(name: 'COMPOSE_PROFILES', defaultValue: 'prod', description: 'Profiles docker-compose (dev, prod, vide = aucun)')
+    booleanParam(name: 'HARD_CLEAN', defaultValue: false, description: 'Nettoyage complet Docker (dangereux sur agent partagé)')
   }
 
   environment {
@@ -21,18 +21,23 @@ pipeline {
 
     stage('Docker version') {
       steps {
-        bat '''
-          docker version
-          docker compose version
-        '''
+        bat 'docker version && docker compose version'
       }
     }
 
     stage('Clean (safe)') {
       steps {
         bat '''
-          echo === Nettoyage Docker local (stack du projet) ===
-          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --profile %COMPOSE_PROFILES% down -v --remove-orphans || ver >NUL
+          rem ===== Prépare COMPOSE (sans --profile si vide) =====
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
+
+          echo === Compose down (safe) ===
+          %COMPOSE% down -v --remove-orphans || ver >NUL
         '''
       }
     }
@@ -53,8 +58,14 @@ pipeline {
     stage('Compose build & up') {
       steps {
         bat '''
-          set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES%
-          echo === Build et lancement des services ===
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
+
+          echo === Build & Up ===
           %COMPOSE% pull
           %COMPOSE% build --no-cache
           %COMPOSE% up -d
@@ -67,7 +78,6 @@ pipeline {
       steps {
         bat '''
           echo === Attente MySQL ===
-          setlocal ENABLEDELAYEDEXPANSION
           for /L %%i in (1,1,60) do (
             for /f "usebackq delims=" %%s in (`docker inspect -f "{{.State.Health.Status}}" vitrine2-mysql 2^>NUL`) do set STATUS=%%s
             if "!STATUS!"=="healthy" goto :ready
@@ -75,7 +85,7 @@ pipeline {
           )
           echo MySQL non prêt après 2min & exit /b 1
           :ready
-          echo MySQL est prêt !
+          echo MySQL prêt
         '''
       }
     }
@@ -83,7 +93,12 @@ pipeline {
     stage('Debug env (optionnel)') {
       steps {
         bat '''
-          set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES%
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
           %COMPOSE% exec -T app sh -lc "php -r 'echo \\\"APP_ENV=\\\".getenv(\\\"APP_ENV\\\").PHP_EOL;'"
         '''
       }
@@ -92,10 +107,14 @@ pipeline {
     stage('Composer install (prod)') {
       steps {
         bat '''
-          set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES%
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
           set SYMFONY_DIR=/var/www/html
 
-          echo === Installation dépendances Symfony ===
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app composer install --no-dev --prefer-dist --no-interaction --no-progress
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php !SYMFONY_DIR!/bin/console about
         '''
@@ -105,17 +124,18 @@ pipeline {
     stage('Migrations & Assets (prod)') {
       steps {
         bat '''
-          set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES%
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
           set SYMFONY_DIR=/var/www/html
 
-          echo === Migration base de données ===
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app php bin/console doctrine:migrations:migrate -n || ^
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app php bin/console doctrine:schema:update --force --no-interaction
 
-          echo === Compilation assets Symfony ===
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app php bin/console asset-map:compile || ver >NUL
-
-          echo === Build Tailwind (si utilisé) ===
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 -w !SYMFONY_DIR! app sh -lc "TAILWINDCSS_PLATFORM=linux-x64 php bin/console tailwind:build || true"
         '''
       }
@@ -124,8 +144,12 @@ pipeline {
     stage('Smoke Test (prod)') {
       steps {
         bat '''
-          set COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES%
-          echo === Vérification application ===
+          set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          if not defined COMPOSE_PROFILES (
+            set "COMPOSE=%BASE%"
+          ) else (
+            if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+          )
           %COMPOSE% ps
           %COMPOSE% exec -T -e APP_ENV=prod -e APP_DEBUG=0 app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
         '''
@@ -136,8 +160,14 @@ pipeline {
   post {
     always {
       bat '''
-        docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES% ps
-        docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never --profile %COMPOSE_PROFILES% logs --no-color > compose.log || ver >NUL
+        set "BASE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+        if not defined COMPOSE_PROFILES (
+          set "COMPOSE=%BASE%"
+        ) else (
+          if "%COMPOSE_PROFILES%"=="" ( set "COMPOSE=%BASE%" ) else ( set "COMPOSE=%BASE% --profile %COMPOSE_PROFILES%" )
+        )
+        %COMPOSE% ps
+        %COMPOSE% logs --no-color > compose.log || ver >NUL
       '''
       archiveArtifacts artifacts: 'compose.log', allowEmptyArchive: true
     }
