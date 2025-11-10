@@ -71,6 +71,7 @@ pipeline {
         bat '''
           set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
           set "SYMFONY_DIR=/var/www/html"
+          echo %APP_ENV%
 
           REM IMPORTANT: forcer l'env PROD pour composer et le cache:clear auto
           %COMPOSE% exec -T -env-file COMPOSE_ENV -w %SYMFONY_DIR% app composer install --no-dev --prefer-dist --no-interaction --no-progress
