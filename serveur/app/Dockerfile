@@ -1,50 +1,43 @@
 FROM php:8.3-apache
 
-# Paquets & extensions PHP
+# --- Dépendances système ---
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
       git unzip pkg-config \
-      libicu-dev libzip-dev \
+      libicu-dev libzip-dev libsqlite3-dev \
       libjpeg62-turbo-dev libpng-dev libfreetype6-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-install -j"$(nproc)" intl pdo_mysql zip gd opcache; \
+    docker-php-ext-install -j"$(nproc)" intl pdo_mysql pdo_sqlite zip gd opcache; \
     a2enmod rewrite headers; \
     rm -rf /var/lib/apt/lists/*
 
-# Composer
+# --- Composer global ---
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Apache -> /public + AllowOverride 
+# --- Configuration Apache ---
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" \
-      /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf \
- && sed -i "/DocumentRoot/a \\\t<Directory ${APACHE_DOCUMENT_ROOT}>\\n\\tAllowOverride All\\n\\tRequire all granted\\n\\t</Directory>" \
-      /etc/apache2/sites-available/000-default.conf
-
-# Forcer la plateforme du binaire Tailwind (évite macOS-arm64 dans un conteneur Linux)
-ENV TAILWINDCSS_PLATFORM=linux-x64
+RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+      /etc/apache2/sites-available/000-default.conf \
+      /etc/apache2/apache2.conf
 
 WORKDIR /var/www/html
 
-# Vendors d'abord (cache build)
+# --- Installation des vendors d’après composer.json ---
+# (copiés avant le reste pour utiliser le cache Docker)
 COPY vitrine/composer.json vitrine/composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts
 
-# Code applicatif
+# --- Copie du code Symfony ---
 COPY vitrine/ .
 
-# Variables par défaut
-ENV APP_ENV=dev \
-    APP_DEBUG=1 \
-    APP_RUNTIME_DISABLE_DOTENV=1
-
-# Optimisations & permissions
+# --- Préparation finale du container ---
 RUN set -eux; \
     composer dump-autoload --no-dev --optimize; \
-    mkdir -p var public/uploads; \
+    mkdir -p var; \
     chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
+
 CMD ["apache2-foreground"]

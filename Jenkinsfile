@@ -1,16 +1,12 @@
 pipeline {
   agent any
-
-  options {
-    timestamps()
-  }
+  options { timestamps() }
 
   environment {
-    DOCKER_BUILDKIT            = '1'
-    COMPOSE_DOCKER_CLI_BUILD   = '1'
-    // chemins côté Windows pour Jenkins
-    COMPOSE_FILE               = 'serveur\\docker-compose.yaml'
-    COMPOSE_ENV                = 'serveur\\.env.compose'
+    DOCKER_BUILDKIT = '1'
+    COMPOSE_DOCKER_CLI_BUILD = '1'
+    COMPOSE_FILE = 'serveur\\docker-compose.yaml'
+    COMPOSE_ENV  = 'serveur\\.env.compose'
   }
 
   stages {
@@ -21,28 +17,10 @@ pipeline {
       }
     }
 
-    // Nettoyage complet optionnel (décommente si besoin)
-    // stage('Clean local Docker environment') {
-    //   steps {
-    //     bat '''
-    //       echo === Nettoyage Docker local ===
-    //       docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% down -v --remove-orphans || ver >NUL
-    //       echo Supprime tous les conteneurs...
-    //       for /f "delims=" %%i in ('docker ps -aq') do docker rm -f %%i 2>NUL
-    //       echo Supprime toutes les images...
-    //       for /f "delims=" %%i in ('docker images -q') do docker rmi -f %%i 2>NUL
-    //       echo Supprime les volumes non utilises...
-    //       docker volume prune -f
-    //       echo Supprime les reseaux non utilises...
-    //       docker network prune -f
-    //       echo Nettoyage termine.
-    //     '''
-    //   }
-    // }
-
     stage('Compose: build & up') {
       steps {
         bat '''
+          echo === Docker Compose build & up ===
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% pull
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% build
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% up -d
@@ -54,51 +32,46 @@ pipeline {
     stage('Wait for MySQL') {
       steps {
         bat '''
-          echo Waiting for MySQL...
+          echo Waiting for MySQL to be ready...
           for /L %%i in (1,1,60) do (
             docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T mysql sh -lc "mysql -hmysql -usymfony -psymfony -e 'SELECT 1'" && goto :ready
             timeout /t 2 >NUL
           )
           echo MySQL not ready after timeout & exit /b 1
           :ready
-          echo MySQL is ready!
+          echo ✅ MySQL is ready!
         '''
       }
     }
- 
-    stage('Composer install (APP_ENV=dev)') {
-      steps {
-        bat '''
-          set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
-          set "SYMFONY_DIR=/var/www/html"
-          echo %APP_ENV%
 
-          REM IMPORTANT: forcer l'env DEV pour composer et le cache:clear auto
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app composer install 
-          
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 app php %SYMFONY_DIR%/bin/console about
-        '''
-      }
-    }
-// --no-dev --prefer-dist --no-interaction --no-progress
-    stage('Migrations & assets (APP_ENV=dev)') {
+    stage('Composer install') {
       steps {
         bat '''
           set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
           set "SYMFONY_DIR=/var/www/html"
 
-          REM (debug) voir les binaires Symfony
-          %COMPOSE% exec -T app sh -lc "pwd; ls -la %SYMFONY_DIR%/bin"
+          echo === Composer install (auto APP_ENV / APP_DEBUG) ===
+          %COMPOSE% exec -T -w %SYMFONY_DIR% app composer install --no-interaction --prefer-dist
+          %COMPOSE% exec -T app php %SYMFONY_DIR%/bin/console about
+        '''
+      }
+    }
 
-          REM migrations (si aucune, ignorer l’erreur)
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console doctrine:migrations:migrate -n || ver >NUL
+    stage('Migrations & assets') {
+      steps {
+        bat '''
+          set "COMPOSE=docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% --ansi=never"
+          set "SYMFONY_DIR=/var/www/html"
 
-          REM --- Tailwind : purge + download (linux-x64) + build ---
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app sh -lc "rm -rf var/tailwind || true"
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console tailwind:build
+          echo === Doctrine migrations ===
+          %COMPOSE% exec -T -w %SYMFONY_DIR% app php bin/console doctrine:migrations:migrate -n || ver >NUL
 
-          REM --- Ensuite, compilation des assets ---
-          %COMPOSE% exec -T -e APP_ENV=dev -e APP_DEBUG=1 -w %SYMFONY_DIR% app php bin/console asset-map:compile
+          echo === Tailwind build ===
+          %COMPOSE% exec -T -w %SYMFONY_DIR% app sh -lc "rm -rf var/tailwind || true"
+          %COMPOSE% exec -T -w %SYMFONY_DIR% app php bin/console tailwind:build
+
+          echo === Asset map compile ===
+          %COMPOSE% exec -T -w %SYMFONY_DIR% app php bin/console asset-map:compile
         '''
       }
     }
@@ -106,8 +79,9 @@ pipeline {
     stage('Smoke test') {
       steps {
         bat '''
+          echo === Smoke test (DB connectivity) ===
           docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
-          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T -e APP_ENV=dev -e APP_DEBUG=1 app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
+          docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% exec -T app php /var/www/html/bin/console dbal:run-sql "SELECT 1"
         '''
       }
     }
@@ -116,6 +90,7 @@ pipeline {
   post {
     always {
       bat '''
+        echo === Docker logs ===
         docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% ps
         docker compose -f %COMPOSE_FILE% --env-file %COMPOSE_ENV% logs --no-color > compose.log || ver >NUL
       '''

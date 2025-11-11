@@ -1,21 +1,21 @@
-version: "3.9"
-
 services:
   app:
     container_name: vitrine2-app
     build:
-      context: ..                 # <— repo root (contient /vitrine et /serveur)
+      context: ..                   # <- repo root (contient /vitrine et /serveur)
       dockerfile: serveur/app/Dockerfile
     ports:
-      - "8081:80"
+      - "${APP_HTTP_PORT:-8081}:80"
+    env_file:
+      - .env.compose                 # <== charge automatiquement APP_ENV, APP_DEBUG, etc.
     environment:
-      APP_ENV: dev
-      APP_SECRET: demo_local_secret_please_change
-      DATABASE_URL: "mysql://symfony:symfony@mysql:3306/symfony?serverVersion=8.4.7&charset=utf8mb4"
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
       MAILER_DSN: "smtp://mailer:1025"
       MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
       APP_RUNTIME_DISABLE_DOTENV: "1"
-      TAILWINDCSS_PLATFORM: "linux-x64"   #  force le bon binaire
     volumes:
       - ../vitrine:/var/www/html:rw,delegated
       - app_var:/var/www/html/var
@@ -29,15 +29,17 @@ services:
     container_name: vitrine2-mysql
     image: mysql:8.4
     restart: unless-stopped
+    env_file:
+      - .env.compose
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: symfony
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3307:3306"
+      - "${MYSQL_HOST_PORT:-3307}:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -49,11 +51,13 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     restart: unless-stopped
     ports:
-      - "8082:80"
+      - "${PMA_HTTP_PORT:-8082}:80"
+    env_file:
+      - .env.compose
     environment:
       PMA_HOST: mysql
-      PMA_USER: symfony
-      PMA_PASSWORD: symfony
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
       UPLOAD_LIMIT: 100M
     depends_on:
       mysql:
